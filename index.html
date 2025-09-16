@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clínicas App - Saúde Integrada</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <style>
+        /* 1. FONTES E VARIÁVEIS DE DESIGN */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary-glow: #00aaff;
+            --secondary-glow: #aa55ff;
+            --background-color: #0d1117;
+            --glass-background: rgba(20, 26, 37, 0.85);
+            --card-background: #141a25;
+            --text-color: #f0f6fc;
+            --light-text-color: #a0aab8;
+            --border-color: rgba(60, 70, 85, 0.5);
+            --danger-color: #ff4d4d;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --shadow-color: rgba(0, 0, 0, 0.4);
+        }
+
+        /* 2. ESTILOS GLOBAIS E RESET */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            background-image: linear-gradient(-45deg, #0d1117, #010409, #161b22, #002240, #161b22, #0d1117);
+            background-size: 400% 400%;
+            animation: aurora-animation 30s ease infinite;
+            color: var(--text-color);
+            padding-bottom: 90px;
+            overflow-x: hidden;
+        }
+        @keyframes aurora-animation { 
+            0% { background-position: 0% 50%; } 
+            50% { background-position: 100% 50%; } 
+            100% { background-position: 0% 50%; } 
+        }
+
+        /* 3. ESTRUTURA E ANIMAÇÕES DE PÁGINA */
+        .app-container, .auth-container { transition: opacity 0.5s ease-in-out; }
+        .auth-container { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .page-content { animation: fadeIn 0.6s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .hidden { display: none !important; }
+
+        /* 4. HEADER */
+        .header {
+            position: sticky; top: 0; z-index: 1000;
+            background: var(--glass-background); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            padding: 15px 25px; display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .avatar {
+            background: linear-gradient(45deg, var(--primary-glow), var(--secondary-glow));
+            border-radius: 50%; width: 45px; height: 45px;
+            display: flex; justify-content: center; align-items: center; font-size: 20px;
+            box-shadow: 0 0 15px rgba(0, 170, 255, 0.3);
+        }
+        .welcome-text { font-size: 13px; color: var(--light-text-color); }
+        .user-name { font-size: 17px; font-weight: 600; }
+
+        /* 5. CONTEÚDO E TÍTULOS */
+        .container { padding: 25px; }
+        h2 { 
+            margin-bottom: 25px; 
+            font-size: 26px; 
+            font-weight: 700; 
+            border-left: 4px solid var(--primary-glow);
+            padding-left: 15px;
+        }
+        
+        /* 6. BOTÕES */
+        .action-btn, .submit-btn {
+            width: 100%; border: none; color: white; padding: 15px;
+            border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .submit-btn { background: linear-gradient(45deg, var(--primary-glow), var(--secondary-glow)); }
+        .submit-btn:hover { transform: scale(1.03); box-shadow: 0 0 20px var(--secondary-glow); }
+        .secondary-btn { background-color: transparent; border: 1px solid var(--primary-glow); color: var(--primary-glow); }
+        .secondary-btn:hover { background-color: var(--primary-glow); color: var(--card-background); }
+        .back-button {
+            background: none; border: 1px solid var(--border-color); color: var(--primary-glow); padding: 10px 20px;
+            border-radius: 8px; font-size: 16px; cursor: pointer; margin-bottom: 25px;
+            display: inline-flex; align-items: center; gap: 10px; transition: all 0.3s ease;
+        }
+        .back-button:hover { background-color: var(--primary-glow); color: var(--card-background); box-shadow: 0 0 15px var(--primary-glow); }
+
+        /* 7. FORMULÁRIOS (GERAL) */
+        .auth-form { width: 100%; max-width: 400px; text-align: center; }
+        .auth-form h1 { margin-bottom: 10px; font-size: 32px; }
+        .auth-form .form-subtitle { margin-bottom: 30px; color: var(--light-text-color); font-size: 16px; }
+        .form-group { margin-bottom: 20px; text-align: left; position: relative; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--light-text-color); }
+        .form-group input, .form-group select {
+            width: 100%; border: 1px solid var(--border-color); background-color: var(--card-background);
+            color: var(--text-color); padding: 15px; border-radius: 10px; font-size: 16px; outline: none;
+            transition: all 0.3s ease;
+        }
+        .form-group input:focus, .form-group select:focus { border-color: var(--primary-glow); box-shadow: 0 0 10px rgba(0,170,255,0.3); }
+        .form-actions { display: flex; flex-direction: column; gap: 15px; margin-top: 25px; }
+        .toggle-auth { color: var(--primary-glow); cursor: pointer; margin-top: 25px; text-decoration: none; display: inline-block; }
+        .toggle-auth:hover { text-decoration: underline; }
+        select { appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2300aaff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 15px top 50%; background-size: 10px auto; padding-right: 40px; }
+
+
+        /* 8. BARRA DE PESQUISA */
+        .search-bar { display: flex; margin-bottom: 35px; }
+        .search-bar input {
+            flex-grow: 1; border: 1px solid var(--border-color); background-color: var(--card-background);
+            color: var(--text-color); padding: 15px; border-radius: 10px 0 0 10px; font-size: 16px; outline: none;
+            transition: all 0.3s ease;
+        }
+        .search-bar input:focus { border-color: var(--primary-glow); box-shadow: 0 0 15px rgba(0,170,255,0.3); }
+        .search-bar button {
+            border: none; background: linear-gradient(45deg, var(--primary-glow), var(--secondary-glow));
+            color: white; padding: 15px 20px; border-radius: 0 10px 10px 0; cursor: pointer; transition: transform 0.3s ease;
+        }
+        .search-bar button:hover { transform: scale(1.05); }
+
+        /* 9. GRID DE CATEGORIAS */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 18px; }
+        .category-item {
+            background-color: var(--card-background); border: 1px solid var(--border-color);
+            border-radius: 15px; padding: 20px; text-align: center; cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .category-item:hover { transform: translateY(-8px); border-color: var(--primary-glow); box-shadow: 0 8px 25px var(--shadow-color); }
+        .icon-background {
+            background-color: var(--glass-background); width: 60px; height: 60px;
+            margin: 0 auto 15px; border-radius: 50%; display: flex;
+            justify-content: center; align-items: center; pointer-events: none; transition: all 0.3s ease;
+        }
+        .icon-background img {
+            width: 32px; height: 32px; object-fit: contain;
+            filter: invert(68%) sepia(99%) saturate(4331%) hue-rotate(171deg) brightness(101%) contrast(101%);
+            transition: filter 0.3s ease;
+        }
+        .category-item:hover .icon-background { background: var(--primary-glow); box-shadow: 0 0 15px var(--primary-glow); }
+        .category-item:hover .icon-background img { filter: invert(1); }
+        .category-item span { font-weight: 500; font-size: 14px; pointer-events: none; }
+
+        /* 10. LISTAS E ITENS */
+        .list-container { display: flex; flex-direction: column; gap: 15px; }
+        .list-item {
+            background-color: var(--card-background); padding: 20px; border-radius: 12px;
+            border: 1px solid var(--border-color); display: flex; align-items: center;
+            gap: 20px; cursor: pointer; transition: all 0.3s ease;
+        }
+        .list-item:hover { border-color: var(--primary-glow); transform: translateX(5px); box-shadow: 0 5px 15px var(--shadow-color); }
+        .list-item .icon { font-size: 28px; color: var(--primary-glow); min-width: 30px; text-align: center; }
+        .list-item p { margin: 0; line-height: 1.5; }
+        .list-item strong { font-size: 16px; color: var(--text-color); }
+        .list-item span { font-size: 14px; color: var(--light-text-color); }
+        
+        /* 11. PÁGINA DE DETALHES */
+        .detail-card { background-color: var(--card-background); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); }
+        .detail-card p { font-size: 16px; color: var(--light-text-color); margin-bottom: 18px; line-height: 1.6; }
+        .detail-card strong { color: var(--text-color); font-weight: 600; min-width: 100px; display: inline-block; }
+        .detail-card .icon { margin-right: 10px; color: var(--primary-glow); }
+
+
+        /* 12. TELA DE CONFIRMAÇÃO */
+        .confirmation-view { text-align: center; }
+        .status-icon {
+            background-color: rgba(40, 167, 69, 0.2); width: 80px; height: 80px;
+            margin: 20px auto; border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            font-size: 36px; color: var(--success-color); border: 2px solid var(--success-color); transition: all 0.4s ease;
+        }
+        .confirmation-details {
+            background-color: var(--card-background); padding: 25px; border-radius: 12px;
+            border: 1px solid var(--border-color); margin: 30px 0; text-align: left;
+        }
+        .confirmation-buttons { display: flex; flex-direction: column; gap: 15px; justify-content: center; margin-top: 20px; }
+        #delete-appointment-btn { background-color: transparent; color: var(--danger-color); border: 1px solid var(--danger-color); }
+        #delete-appointment-btn:hover { background-color: var(--danger-color); color: white; }
+
+        /* 13. RODAPÉ */
+        .footer {
+            position: fixed; bottom: 0; left: 0; width: 100%; z-index: 1000;
+            background: var(--glass-background); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            display: flex; justify-content: space-around; padding: 10px 0;
+            border-top: 1px solid var(--border-color);
+        }
+        .footer-item {
+            display: flex; flex-direction: column; align-items: center;
+            color: var(--light-text-color); text-decoration: none; font-size: 12px;
+            transition: all 0.3s ease; flex-basis: 0; flex-grow: 1; padding: 5px 0;
+        }
+        .footer-item i { font-size: 22px; margin-bottom: 6px; transition: transform 0.3s ease; }
+        .footer-item:hover { color: var(--primary-glow); }
+        .footer-item:hover i { transform: translateY(-3px); }
+        .footer-item.active { color: var(--primary-glow); font-weight: 600; }
+
+        /* 14. COMPONENTES ADICIONAIS (TOAST, SPINNER) */
+        .toast {
+            position: fixed; top: 20px; right: 20px; background-color: var(--card-background);
+            color: var(--text-color); padding: 15px 25px; border-radius: 10px;
+            border-left: 5px solid var(--primary-glow);
+            box-shadow: 0 5px 15px var(--shadow-color);
+            z-index: 9999;
+            opacity: 0; transform: translateX(100%);
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+        .toast.show { opacity: 1; transform: translateX(0); }
+        .toast.success { border-color: var(--success-color); }
+        .toast.error { border-color: var(--danger-color); }
+
+        .loader-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(13, 17, 23, 0.7);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 10000;
+        }
+        .loader {
+            border: 5px solid var(--border-color);
+            border-top: 5px solid var(--primary-glow);
+            border-radius: 50%;
+            width: 50px; height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* 15. RESPONSIVIDADE */
+        @media (max-width: 600px) {
+            .container { padding: 15px; }
+            .header { padding: 15px; }
+            h2 { font-size: 22px; }
+            .grid-container { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }
+            .confirmation-buttons { flex-direction: column; }
+            .footer-item span { font-size: 11px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="toast" class="toast"></div>
+    <div id="loader" class="loader-overlay hidden"><div class="loader"></div></div>
+
+    <div id="auth-container" class="auth-container">
+        <div id="login-view">
+            <form id="login-form" class="auth-form">
+                <h1>Bem-vindo de Volta!</h1> 
+                <p class="form-subtitle">Faça login para acessar a plataforma.</p>
+                <div class="form-group"> <label for="login-email">Email</label> <input type="email" id="login-email" required autocomplete="email"> </div>
+                <div class="form-group"> <label for="login-password">Senha</label> <input type="password" id="login-password" required autocomplete="current-password"> </div>
+                <div class="form-actions"> <button type="submit" class="submit-btn"><i class="fas fa-sign-in-alt"></i> Entrar</button> </div>
+                <p class="toggle-auth" onclick="toggleAuthView()">Não tem uma conta? <strong>Cadastre-se</strong></p>
+            </form>
+        </div>
+        <div id="register-view" class="hidden">
+             <form id="register-form" class="auth-form">
+                <h1>Crie sua Conta</h1> 
+                <p class="form-subtitle">É rápido, fácil e gratuito.</p>
+                <div class="form-group"> <label for="register-name">Nome Completo</label> <input type="text" id="register-name" required autocomplete="name"> </div>
+                <div class="form-group"> <label for="register-email">Email</label> <input type="email" id="register-email" required autocomplete="email"> </div>
+                <div class="form-group"> <label for="register-password">Senha</label> <input type="password" id="register-password" required autocomplete="new-password"> </div>
+                <div class="form-actions"> <button type="submit" class="submit-btn"><i class="fas fa-user-plus"></i> Cadastrar</button> </div>
+                <p class="toggle-auth" onclick="toggleAuthView()">Já tem uma conta? <strong>Faça Login</strong></p>
+            </form>
+        </div>
+    </div>
+    
+    <div id="app-container" class="app-container">
+        <header class="header">
+            <div class="user-info">
+                <div class="avatar"><i class="fas fa-user"></i></div>
+                <div> <p class="welcome-text">Bem-vindo</p> <p id="user-name-header" class="user-name"></p> </div>
+            </div>
+        </header>
+
+        <main class="container">
+            <section id="home-view" class="page-content">
+                <form class="search-bar" id="search-form">
+                    <input type="search" id="search-input" placeholder="Pesquisar por nome, especialidade...">
+                    <button type="submit" aria-label="Pesquisar"><i class="fas fa-search"></i></button>
+                </form>
+                <h2>Categorias</h2>
+                <div class="grid-container">
+                    <div class="category-item" data-category="Consultas"> <div class="icon-background"><img src="consulta.png" alt=""></div> <span>Consultas</span> </div>
+                    <div class="category-item" data-category="Dentistas"> <div class="icon-background"><img src="dentista.png" alt=""></div> <span>Dentistas</span> </div>
+                    <div class="category-item" data-category="Cardiologia"> <div class="icon-background"><img src="cardiologia.png" alt=""></div> <span>Cardiologia</span> </div>
+                    <div class="category-item" data-category="Hospital"> <div class="icon-background"><img src="hospital.png" alt=""></div> <span>Hospital</span> </div>
+                    <div class="category-item" data-category="Emergência"> <div class="icon-background"><img src="emergencia.png" alt=""></div> <span>Emergência</span> </div>
+                    <div class="category-item" data-category="Exames"> <div class="icon-background"><img src=exame.png" alt=""></div> <span>Exames</span> </div>
+                </div>
+            </section>
+            
+            <section id="results-view" class="page-content hidden">
+                <button class="back-button" onclick="showPage('home-view')"><i class="fas fa-arrow-left"></i> Voltar</button>
+                <h2 id="results-title">Resultados</h2>
+                <div id="results-container" class="list-container"></div>
+            </section>
+
+            <section id="detail-view" class="page-content hidden">
+                 <button class="back-button" onclick="window.history.back()"><i class="fas fa-arrow-left"></i> Voltar</button>
+                 <h2 id="detail-title">Detalhes</h2>
+                 <div id="detail-container" class="detail-card"></div>
+            </section>
+
+            <section id="doutores-view" class="page-content hidden">
+                <h2>Nossos Doutores</h2>
+                <div id="doctors-container" class="list-container"></div>
+            </section>
+            
+            <section id="agendar-view" class="page-content hidden">
+                <h2>Agendar Consulta</h2>
+                <form id="appointment-form">
+                    <div class="form-group">
+                        <label for="specialty-select">Especialidade</label>
+                        <select id="specialty-select" name="specialty" required>
+                            <option value="">Selecione a especialidade</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="doctor-select">Doutor(a)</label>
+                        <select id="doctor-select" name="doctor" required disabled>
+                            <option value="">Selecione primeiro a especialidade</option>
+                        </select>
+                    </div>
+                    <div class="form-group"> <label for="appointment-date">Data da Consulta</label> <input type="date" id="appointment-date" required> </div>
+                    <div class="form-group"> <label for="appointment-time">Hora da Consulta</label> <input type="time" id="appointment-time" required> </div>
+                    <button type="submit" class="submit-btn"><i class="fas fa-check"></i> Confirmar Agendamento</button>
+                </form>
+            </section>
+            
+            <section id="confirmation-view" class="page-content hidden confirmation-view">
+                <div class="status-icon"> <i class="fas fa-check"></i> </div>
+                <h2 id="confirmation-title">Consulta Agendada!</h2>
+                <div id="confirmation-details" class="confirmation-details"></div>
+                <div class="confirmation-buttons">
+                    <button id="delete-appointment-btn" class="action-btn"><i class="fas fa-trash"></i> Apagar Consulta</button>
+                    <button class="action-btn submit-btn" onclick="showPage('home-view')"><i class="fas fa-home"></i> Voltar ao Início</button>
+                </div>
+            </section>
+            
+            <section id="perfil-view" class="page-content hidden">
+                <h2>Meu Perfil</h2>
+                <div class="list-container">
+                    <div class="list-item"> <div class="icon"><i class="fas fa-user"></i></div> <div><p><strong>Nome</strong><br><span id="profile-name"></span></p></div> </div>
+                    <div class="list-item"> <div class="icon"><i class="fas fa-envelope"></i></div> <div><p><strong>Email</strong><br><span id="profile-email"></span></p></div> </div>
+                    <div class="list-item"> <div class="icon"><i class="fas fa-shield-alt"></i></div> <div><p><strong>Plano</strong><br><span>Plano Ouro (Padrão)</span></p></div> </div>
+                </div>
+                <div id="my-appointments" style="margin-top: 30px;">
+                    <h2>Minhas Consultas</h2>
+                    <div id="my-appointments-container" class="list-container">
+                        <p>Nenhuma consulta agendada.</p>
+                    </div>
+                </div>
+                 <div class="form-actions" style="margin-top: 30px;">
+                    <button id="edit-profile-btn" class="action-btn secondary-btn"><i class="fas fa-edit"></i> Editar Perfil</button>
+                    <button class="action-btn" style="background-color: var(--danger-color);" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Sair</button>
+                </div>
+            </section>
+            
+            <section id="edit-perfil-view" class="page-content hidden">
+                <h2>Editar Perfil</h2>
+                <form id="edit-profile-form">
+                    <div class="form-group">
+                        <label for="edit-profile-name">Nome Completo</label>
+                        <input type="text" id="edit-profile-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-profile-email">Email</label>
+                        <input type="email" id="edit-profile-email" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="submit-btn"><i class="fas fa-save"></i> Salvar Alterações</button>
+                        <button type="button" id="cancel-edit-btn" class="action-btn secondary-btn"><i class="fas fa-times"></i> Cancelar</button>
+                    </div>
+                </form>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <a href="#" class="footer-item active" data-page="home-view"> <i class="fas fa-home"></i> <span>Home</span> </a>
+            <a href="#" class="footer-item" data-page="doutores-view"> <i class="fas fa-user-md"></i> <span>Doutores</span> </a>
+            <a href="#" class="footer-item" data-page="agendar-view"> <i class="fas fa-calendar-alt"></i> <span>Agendar</span> </a>
+            <a href="#" class="footer-item" data-page="perfil-view"> <i class="fas fa-user-circle"></i> <span>Perfil</span> </a>
+        </footer>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- BANCO DE DADOS FICTÍCIO EXPANDIDO ---
+        const db = [
+            { id: 1, name: 'Hospital Moacir do Carmo', type: 'Hospital', category: 'Hospital', address: 'Rod. Washington Luiz, 3200, Duque de Caxias, RJ', phone: '(21) 2672-5555', services: ['Emergência 24h', 'Internação', 'UTI', 'Maternidade'] },
+            { id: 2, name: 'Hospital Adão Pereira Nunes', type: 'Hospital', category: 'Hospital', address: 'Rod. Washington Luiz, Km 109, Duque de Caxias, RJ', phone: '(21) 3651-9999', services: ['Emergência', 'Traumatologia', 'Cirurgia Geral'] },
+            { id: 3, name: 'Clínica Sorriso Feliz', type: 'Clínica', category: 'Dentistas', address: 'Rua do Sorriso, 45, Caxias, RJ', phone: '(21) 9999-8888', doctors: [{id: 101, name: 'Dr. Carlos Andrade', specialty: 'Dentista'}] },
+            { id: 4, name: 'Coraclin Cardiologia', type: 'Clínica', category: 'Cardiologia', address: 'Av. do Coração, 789, Caxias, RJ', phone: '(21) 3333-4444', doctors: [{id: 102, name: 'Dr. Marcos Castro', specialty: 'Cardiologista'}] },
+            { id: 5, name: 'Laboratório Bronstein', type: 'Laboratório', category: 'Exames', address: 'Av. Nilo Peçanha, 455, Duque de Caxias, RJ', phone: '(21) 2771-1000', services: ['Exames de Sangue', 'Raio-X', 'Ressonância Magnética', 'Tomografia'] },
+            { id: 6, name: 'Clínica Geral Viver Bem', type: 'Clínica', category: 'Consultas', address: 'Rua da Saúde, 202, Caxias, RJ', phone: '(21) 7777-8888', doctors: [{id: 103, name: 'Dr. Afonso Padilha', specialty: 'Clínico Geral'}, {id: 104, name: 'Dra. Juliana Paes', specialty: 'Pediatra'}] },
+            { id: 7, name: 'SAMU - Emergência', type: 'Serviço', category: 'Emergência', phone: '192', services: ['Atendimento de emergência móvel'], address: 'Disponível em toda a cidade' },
+            { id: 8, name: 'Dermatoclin', type: 'Clínica', category: 'Consultas', address: 'Rua das Palmeiras, 33, Jardim 25 de Agosto, Caxias, RJ', phone: '(21) 3131-4141', doctors: [{id: 105, name: 'Dra. Fernanda Lima', specialty: 'Dermatologista'}] },
+            { id: 9, name: 'Clínica de Olhos Caxias', type: 'Clínica', category: 'Consultas', address: 'Praça do Pacificador, 12, Centro, Caxias, RJ', phone: '(21) 2772-9090', doctors: [{id: 106, name: 'Dr. Roberto Mendes', specialty: 'Oftalmologista'}] },
+        ];
+        const allDoctors = db.flatMap(item => item.doctors || []).filter((doc, index, self) => index === self.findIndex((d) => d.id === doc.id));
+        const allSpecialties = [...new Set(allDoctors.map(doc => doc.specialty))];
+
+        // --- SELETORES DO DOM ---
+        const authContainer = document.getElementById('auth-container'), appContainer = document.getElementById('app-container');
+        const loginView = document.getElementById('login-view'), registerView = document.getElementById('register-view');
+        const loginForm = document.getElementById('login-form'), registerForm = document.getElementById('register-form');
+        const searchForm = document.getElementById('search-form'), searchInput = document.getElementById('search-input');
+        const footerLinks = document.querySelectorAll('.footer-item'), categoryItems = document.querySelectorAll('.category-item');
+        const logoutBtn = document.getElementById('logout-btn'), allPageViews = document.querySelectorAll('.page-content');
+        const appointmentForm = document.getElementById('appointment-form'), deleteAppointmentBtn = document.getElementById('delete-appointment-btn');
+        const specialtySelect = document.getElementById('specialty-select'), doctorSelect = document.getElementById('doctor-select');
+        const toast = document.getElementById('toast'), loader = document.getElementById('loader');
+        const editProfileBtn = document.getElementById('edit-profile-btn');
+        const editProfileForm = document.getElementById('edit-profile-form');
+        const cancelEditBtn = document.getElementById('cancel-edit-btn');
+
+
+        // --- FUNÇÕES UTILITÁRIAS ---
+        const showToast = (message, type = 'info') => {
+            toast.textContent = message;
+            toast.className = `toast show ${type}`;
+            setTimeout(() => { toast.className = 'toast'; }, 3000);
+        };
+        const toggleLoader = (show) => loader.classList.toggle('hidden', !show);
+        
+        // --- NAVEGAÇÃO E HISTÓRICO ---
+        let pageHistory = ['home-view'];
+
+        const showPage = (pageId, state = {}) => {
+            if (pageId !== pageHistory[pageHistory.length - 1]) {
+                pageHistory.push(pageId);
+            }
+            renderPage(pageId, state);
+        };
+
+        window.goBack = () => {
+            if (pageHistory.length > 1) {
+                pageHistory.pop();
+                const previousPage = pageHistory[pageHistory.length - 1];
+                renderPage(previousPage);
+            } else {
+                renderPage('home-view');
+            }
+        };
+
+        const renderPage = (pageId, state = {}) => {
+            allPageViews.forEach(view => view.classList.add('hidden'));
+            const page = document.getElementById(pageId);
+            if (page) page.classList.remove('hidden');
+            updateFooter(pageId);
+            window.scrollTo(0, 0);
+
+            if (pageId === 'detail-view' && state.itemId) renderDetail(state.itemId);
+            if (pageId === 'results-view' && state.results) renderResults(state.results, state.title);
+            if (pageId === 'perfil-view') renderMyAppointments();
+        };
+
+        // --- BOTÃO VOLTAR DO NAVEGADOR (experimental) ---
+        window.addEventListener('popstate', (event) => {
+             if (pageHistory.length > 1) pageHistory.pop();
+             const previousPage = pageHistory[pageHistory.length - 1] || 'home-view';
+             renderPage(previousPage);
+        });
+        
+        const updateFooter = (activePageId) => footerLinks.forEach(link => link.classList.toggle('active', link.dataset.page === activePageId));
+
+        // --- AUTENTICAÇÃO ---
+        const updateUserInfo = (userData) => {
+            document.getElementById('user-name-header').textContent = userData.name;
+            document.getElementById('profile-name').textContent = userData.name;
+            document.getElementById('profile-email').textContent = userData.email;
+        };
+        
+        const checkLoginStatus = () => {
+            const user = localStorage.getItem('clinicasAppUser');
+            if (user) {
+                const userData = JSON.parse(user);
+                authContainer.style.display = 'none'; appContainer.style.display = 'block';
+                updateUserInfo(userData);
+                renderPage(pageHistory[pageHistory.length-1] || 'home-view');
+            } else {
+                authContainer.style.display = 'flex'; appContainer.style.display = 'none';
+            }
+        };
+        
+        window.toggleAuthView = () => { loginView.classList.toggle('hidden'); registerView.classList.toggle('hidden'); };
+        
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            toggleLoader(true);
+            setTimeout(() => {
+                const user = { name: document.getElementById('register-name').value, email: document.getElementById('register-email').value, password: document.getElementById('register-password').value };
+                localStorage.setItem('clinicasAppUser', JSON.stringify(user));
+                toggleLoader(false);
+                showToast('Cadastro realizado com sucesso!', 'success');
+                checkLoginStatus();
+            }, 1000);
+        });
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            toggleLoader(true);
+            setTimeout(() => {
+                const storedUser = JSON.parse(localStorage.getItem('clinicasAppUser'));
+                const email = document.getElementById('login-email').value, password = document.getElementById('login-password').value;
+                toggleLoader(false);
+                if (storedUser && email === storedUser.email && password === storedUser.password) {
+                    showToast('Login bem-sucedido!', 'success');
+                    checkLoginStatus();
+                } else {
+                    showToast('Email ou senha incorretos.', 'error');
+                }
+            }, 1000);
+        });
+        
+        logoutBtn.addEventListener('click', () => { pageHistory = ['home-view']; localStorage.removeItem('clinicasAppUser'); checkLoginStatus(); });
+
+        // --- RENDERIZAÇÃO DE CONTEÚDO ---
+        const renderResults = (results, title) => {
+            const container = document.getElementById('results-container');
+            document.getElementById('results-title').textContent = title;
+            container.innerHTML = results.length ? results.map(item => `
+                <div class="list-item" data-id="${item.id}">
+                    <div class="icon"><i class="fas fa-clinic-medical"></i></div>
+                    <div><p><strong>${item.name}</strong><br><span>${item.category} - ${item.address}</span></p></div>
+                </div>`).join('') : '<p>Nenhum resultado encontrado.</p>';
+            
+            container.querySelectorAll('.list-item').forEach(item => {
+                item.addEventListener('click', () => showPage('detail-view', { itemId: parseInt(item.dataset.id) }));
+            });
+        };
+
+        const renderDetail = (itemId) => {
+            const item = db.find(d => d.id === itemId) || allDoctors.find(d => d.id === itemId);
+            if(!item) return;
+
+            const container = document.getElementById('detail-container');
+            document.getElementById('detail-title').textContent = item.name;
+            let detailsHtml = '';
+            
+            if (item.specialty) {
+                detailsHtml += `<p><i class="icon fas fa-user-md"></i><strong>Especialidade:</strong> ${item.specialty}</p>`;
+                const clinic = db.find(c => c.doctors && c.doctors.some(d => d.id === item.id));
+                if (clinic) {
+                     detailsHtml += `<p><i class="icon fas fa-hospital"></i><strong>Atende em:</strong> ${clinic.name}</p>`;
+                     detailsHtml += `<p><i class="icon fas fa-map-marker-alt"></i><strong>Endereço:</strong> ${clinic.address}</p>`;
+                }
+            } else {
+                detailsHtml += `<p><i class="icon fas fa-clinic-medical"></i><strong>Tipo:</strong> ${item.type}</p>`;
+                if (item.address) detailsHtml += `<p><i class="icon fas fa-map-marker-alt"></i><strong>Endereço:</strong> ${item.address}</p>`;
+                if (item.phone) detailsHtml += `<p><i class="icon fas fa-phone"></i><strong>Telefone:</strong> ${item.phone}</p>`;
+                if (item.services) detailsHtml += `<p><i class="icon fas fa-concierge-bell"></i><strong>Serviços:</strong> ${item.services.join(', ')}</p>`;
+                if (item.doctors) detailsHtml += `<p><i class="icon fas fa-user-md"></i><strong>Doutores:</strong> ${item.doctors.map(d=>d.name).join(', ')}</p>`;
+            }
+            container.innerHTML = detailsHtml;
+        };
+
+        const renderDoctors = () => {
+            const container = document.getElementById('doctors-container');
+            container.innerHTML = allDoctors.map(doc => `
+                <div class="list-item" data-id="${doc.id}">
+                    <div class="icon"><i class="fas fa-user-md"></i></div>
+                    <div><p><strong>${doc.name}</strong><br><span>${doc.specialty}</span></p></div>
+                </div>`).join('');
+
+            container.querySelectorAll('.list-item').forEach(item => {
+                item.addEventListener('click', () => showPage('detail-view', { itemId: parseInt(item.dataset.id) }));
+            });
+        };
+
+        const populateAppointmentForm = () => {
+            specialtySelect.innerHTML = '<option value="">Selecione a especialidade</option>' + 
+                allSpecialties.sort().map(s => `<option value="${s}">${s}</option>`).join('');
+        };
+
+        const renderMyAppointments = () => {
+            const container = document.getElementById('my-appointments-container');
+            const appointments = JSON.parse(localStorage.getItem('myAppointments')) || [];
+            if (appointments.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--light-text-color);">Nenhuma consulta agendada.</p>';
+                return;
+            }
+            container.innerHTML = appointments.map((app, index) => `
+                <div class="list-item">
+                    <div class="icon"><i class="fas fa-calendar-check"></i></div>
+                    <div><p><strong>${app.doctor}</strong><br><span>${app.formattedDate} às ${app.time}</span></p></div>
+                </div>
+            `).join('');
+        };
+        
+        // --- EVENT LISTENERS ---
+        searchForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const term = searchInput.value.toLowerCase();
+            if (!term) return;
+            const results = db.filter(item => 
+                item.name.toLowerCase().includes(term) || 
+                item.category.toLowerCase().includes(term) || 
+                (item.doctors && item.doctors.some(d => d.name.toLowerCase().includes(term) || d.specialty.toLowerCase().includes(term)))
+            );
+            showPage('results-view', { results: results, title: `Resultados para "${searchInput.value}"` });
+        });
+
+        categoryItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const category = item.dataset.category;
+                const results = db.filter(dbItem => dbItem.category === category);
+                showPage('results-view', { results: results, title: category });
+            });
+        });
+        
+        footerLinks.forEach(link => {
+            link.addEventListener('click', (e) => { e.preventDefault(); showPage(link.dataset.page); });
+        });
+
+        specialtySelect.addEventListener('change', () => {
+            const selectedSpecialty = specialtySelect.value;
+            doctorSelect.innerHTML = '<option value="">Selecione o(a) Doutor(a)</option>';
+            if (selectedSpecialty) {
+                const filteredDoctors = allDoctors.filter(doc => doc.specialty === selectedSpecialty);
+                doctorSelect.innerHTML += filteredDoctors.map(doc => `<option value="${doc.name}">${doc.name}</option>`).join('');
+                doctorSelect.disabled = false;
+            } else {
+                doctorSelect.disabled = true;
+            }
+        });
+
+        appointmentForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const appointment = {
+                doctor: doctorSelect.value, 
+                date: document.getElementById('appointment-date').value, 
+                time: document.getElementById('appointment-time').value,
+                id: Date.now()
+            };
+            if(!appointment.doctor || !appointment.date || !appointment.time) {
+                showToast('Por favor, preencha todos os campos.', 'error');
+                return;
+            }
+            appointment.formattedDate = new Date(appointment.date + 'T00:00:00').toLocaleDateString('pt-BR');
+
+            const appointments = JSON.parse(localStorage.getItem('myAppointments')) || [];
+            appointments.push(appointment);
+            localStorage.setItem('myAppointments', JSON.stringify(appointments));
+
+            document.getElementById('confirmation-details').innerHTML = `
+                <p><strong>Doutor(a):</strong> ${appointment.doctor}</p>
+                <p><strong>Data:</strong> ${appointment.formattedDate}</p>
+                <p><strong>Hora:</strong> ${appointment.time}</p>`;
+            
+            showPage('confirmation-view');
+            appointmentForm.reset();
+            doctorSelect.disabled = true;
+        });
+
+        deleteAppointmentBtn.addEventListener('click', () => {
+            showToast("Função de apagar ainda não implementada.", "warning");
+        });
+
+        editProfileBtn.addEventListener('click', () => {
+            const user = JSON.parse(localStorage.getItem('clinicasAppUser'));
+            if (user) {
+                document.getElementById('edit-profile-name').value = user.name;
+                document.getElementById('edit-profile-email').value = user.email;
+                showPage('edit-perfil-view');
+            }
+        });
+
+        cancelEditBtn.addEventListener('click', () => {
+            showPage('perfil-view');
+        });
+
+        editProfileForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const user = JSON.parse(localStorage.getItem('clinicasAppUser'));
+            if (user) {
+                user.name = document.getElementById('edit-profile-name').value;
+                user.email = document.getElementById('edit-profile-email').value;
+                localStorage.setItem('clinicasAppUser', JSON.stringify(user));
+                updateUserInfo(user);
+                showToast('Perfil atualizado com sucesso!', 'success');
+                showPage('perfil-view');
+            }
+        });
+
+        // --- INICIALIZAÇÃO ---
+        document.querySelectorAll('.back-button').forEach(button => {
+            button.onclick = () => goBack();
+        });
+        
+        renderDoctors();
+        populateAppointmentForm();
+        checkLoginStatus();
+    });
+    </script>
+</body>
+</html>
